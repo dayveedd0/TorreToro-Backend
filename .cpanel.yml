@@ -1,0 +1,29 @@
+---
+deployment:
+  tasks:
+    # --------------------------------------------------------------------------
+    # 1. Target Deployment Directory
+    # Default: $HOME/api.torretoro.com
+    # Change 'api.torretoro.com' below to your actual subdomain directory name
+    # (e.g. $HOME/backend.torretoro.com or $HOME/public_html/api)
+    # --------------------------------------------------------------------------
+    - export DEPLOYPATH=${DEPLOYPATH:-$HOME/api.torretoro.com}
+    - /bin/mkdir -p $DEPLOYPATH
+
+    # --------------------------------------------------------------------------
+    # 2. Copy Application Files & .htaccess
+    # --------------------------------------------------------------------------
+    - /bin/cp -R * $DEPLOYPATH/ 2>/dev/null || true
+    - /bin/cp -a public/.htaccess $DEPLOYPATH/public/ 2>/dev/null || true
+    - /bin/cp -a .env.production.example $DEPLOYPATH/ 2>/dev/null || true
+
+    # --------------------------------------------------------------------------
+    # 3. Ensure Storage & Cache Directories Exist with Writable Permissions
+    # --------------------------------------------------------------------------
+    - /bin/mkdir -p $DEPLOYPATH/storage/app/public $DEPLOYPATH/storage/framework/cache $DEPLOYPATH/storage/framework/sessions $DEPLOYPATH/storage/framework/views $DEPLOYPATH/storage/logs $DEPLOYPATH/bootstrap/cache
+    - /bin/chmod -R 775 $DEPLOYPATH/storage $DEPLOYPATH/bootstrap/cache 2>/dev/null || true
+
+    # --------------------------------------------------------------------------
+    # 4. Create Public Storage Symlink
+    # --------------------------------------------------------------------------
+    - /bin/ln -snf $DEPLOYPATH/storage/app/public $DEPLOYPATH/public/storage 2>/dev/null || true
